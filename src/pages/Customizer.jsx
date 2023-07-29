@@ -38,13 +38,56 @@ function Customizer() {
       case "colorpicker":
         return <ColorPicker />;
       case "filepicker":
-        return <FilePicker />;
+        return <FilePicker file={file} setFile={setFile} readFile={readFile}/>;
       case "aipicker":
         return <AIpicker />;
        default:
         return null;
     }
   };
+
+  const handleDecals = (type, result) => {
+    const decalType = DecalTypes[type]
+
+    // updating the state
+    state[decalType.stateProperty] = result
+
+    // figuring our if the decaltype  is currently active
+    if(!setActiveFilterTab[decalType.filterTab]){
+      handleActiveFilterTab(decalType.filterTab)
+    }
+
+  }
+
+  // are we showing the logo or are we showing the texture or are we showing both
+  const handleActiveFilterTab = (tabName) => {
+    switch (tabName) {
+      case "logoShirt":
+          state.isLogoTexture = !activeFilterTab[tabName];
+        break;
+      case "stylishShirt":
+          state.isFullTexture = !activeFilterTab[tabName];
+        break;
+      default:
+        state.isLogoTexture = true;
+        state.isFullTexture = false;
+        break;
+    }
+
+    // after setting the state, activeFilterTab is updated
+
+    setActiveFilterTab(prevState => ({... prevState, [tabName]: !prevState[tabName]}))
+  }
+
+
+
+  const readFile = type => {
+    reader(file)
+      .then(result => {
+        handleDecals(type, result)
+        setActiveEditorTab('')
+      })
+  }
 
   return (
     <AnimatePresence>
@@ -85,9 +128,9 @@ function Customizer() {
               <Tab
                 key={tab.name}
                 tab={tab}
-                handleClick={() => {}}
+                handleClick={() => {handleActiveFilterTab(tab.name)}}
                 isFilterTab
-                isActiveTab=""
+                isActiveTab={activeFilterTab[tab.name]}
               />
             ))}
           </motion.div>
