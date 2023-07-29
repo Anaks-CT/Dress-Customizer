@@ -17,6 +17,35 @@ import {
 
 function Customizer() {
   const snap = useSnapshot(state);
+
+  // for uploading file
+  const [file, setFile] = useState("");
+  // for AI prompt
+  const [prompt, setPrompt] = useState("");
+  // loading state
+  const [generatingImg, setGeneratingImg] = useState(false);
+
+  const [activeEditorTab, setActiveEditorTab] = useState("");
+  const [activeFilterTab, setActiveFilterTab] = useState({
+    logoShirt: true,
+    stylishShirt: false,
+  });
+
+  // show tab content depending on the activeTab
+  const generateTabContent = () => {
+    // switch tab is going to look the active editor tab
+    switch (activeEditorTab) {
+      case "colorpicker":
+        return <ColorPicker />;
+      case "filepicker":
+        return <FilePicker />;
+      case "aipicker":
+        return <AIpicker />;
+       default:
+        return null;
+    }
+  };
+
   return (
     <AnimatePresence>
       {!snap.intro && (
@@ -29,8 +58,9 @@ function Customizer() {
             <div className="flex items-center min-h-screen">
               <div className="editortabs-container tabs">
                 {EditorTabs.map((tab) => (
-                  <Tab key={tab.name} tab={tab} handleClick={() => {}} />
+                  <Tab key={tab.name} tab={tab} handleClick={() => {setActiveEditorTab(tab.name)}} />
                 ))}
+                {generateTabContent()}
               </div>
             </div>
           </motion.div>
@@ -52,7 +82,13 @@ function Customizer() {
             {...slideAnimation("up")}
           >
             {FilterTabs.map((tab) => (
-              <Tab key={tab.name} tab={tab} handleClick={() => {}} isFilterTab isActiveTab=''/>
+              <Tab
+                key={tab.name}
+                tab={tab}
+                handleClick={() => {}}
+                isFilterTab
+                isActiveTab=""
+              />
             ))}
           </motion.div>
         </>
