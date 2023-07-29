@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSnapshot } from "valtio";
-import config from "../config/config";
 import state from "../store";
-import { download } from "../assets";
-import { downloadCanvasToImage, reader } from "../config/helpers";
+import { reader } from "../config/helpers";
 import { DecalTypes, EditorTabs, FilterTabs } from "../config/constants";
 import { fadeAnimation, slideAnimation } from "../config/motion";
 import {
@@ -40,11 +38,45 @@ function Customizer() {
       case "filepicker":
         return <FilePicker file={file} setFile={setFile} readFile={readFile}/>;
       case "aipicker":
-        return <AIpicker />;
+        return <AIpicker 
+          prompt={prompt}
+          setPrompt={setPrompt}
+          generatingImg={generatingImg}
+          handleSubmit={handleSubmit}
+        />;
        default:
         return null;
     }
   };
+
+  const handleSubmit = async (type) => {
+    if (!prompt) return alert("Please enter a prompt");
+  
+    try {
+      // calling the backend to generate an ai image
+      setGeneratingImg(true);
+      const response = await fetch('https://project-threejs-48u7.onrender.com/api/v1/dalle', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt
+        })
+      });
+  
+      const data = await response.json(); // Parse the response body as JSON
+  
+      console.log(data.photo);
+      handleDecals(type, `data:image/png;base64,${data.photo}`);
+    } catch (error) {
+      alert(error);
+    } finally {
+      setGeneratingImg(false);
+      setActiveEditorTab('');
+    }
+  }
+
 
   const handleDecals = (type, result) => {
     const decalType = DecalTypes[type]

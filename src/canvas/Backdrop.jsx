@@ -1,6 +1,4 @@
 // slight yellow shadow behind the shirt
-import { useFrame } from "@react-three/fiber"
-import { easing } from "maath"
 import { useRef } from "react"
 import {AccumulativeShadows, RandomizedLight} from '@react-three/drei'
 
